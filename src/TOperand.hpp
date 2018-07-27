@@ -49,11 +49,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Add(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Add(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Add(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Add(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Add(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Add(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Add(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Add(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Add(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Add(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }
@@ -65,11 +65,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Substract(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Substract(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Substract(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Substract(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Substract(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Substract(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Substract(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Substract(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Substract(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Substract(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }
@@ -81,11 +81,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Multiply(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Multiply(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Multiply(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Multiply(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Multiply(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Multiply(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Multiply(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Multiply(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Multiply(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Multiply(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }
@@ -97,11 +97,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Divide(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Divide(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Divide(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Divide(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Divide(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Divide(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Divide(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Divide(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Divide(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Divide(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }
@@ -113,11 +113,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Modulo(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Modulo(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Modulo(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Modulo(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Modulo(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Modulo(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Modulo(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Modulo(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Modulo(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Modulo(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }
@@ -129,11 +129,11 @@ public:
 
 		switch (RhsType)
 		{
-			case Int8:		return Power(*this, dynamic_cast<const TOperand<char>&>(rhs), ResultType);
-			case Int16:		return Power(*this, dynamic_cast<const TOperand<short>&>(rhs), ResultType);
-			case Int32:		return Power(*this, dynamic_cast<const TOperand<int>&>(rhs), ResultType);
-			case Float:		return Power(*this, dynamic_cast<const TOperand<float>&>(rhs), ResultType);
-			case Double:	return Power(*this, dynamic_cast<const TOperand<double>&>(rhs), ResultType);
+			case Int8:		return Power(*this, reinterpret_cast<const TOperand<char>&>(rhs), ResultType);
+			case Int16:		return Power(*this, reinterpret_cast<const TOperand<short>&>(rhs), ResultType);
+			case Int32:		return Power(*this, reinterpret_cast<const TOperand<int>&>(rhs), ResultType);
+			case Float:		return Power(*this, reinterpret_cast<const TOperand<float>&>(rhs), ResultType);
+			case Double:	return Power(*this, reinterpret_cast<const TOperand<double>&>(rhs), ResultType);
 		}
 		return nullptr;
     }

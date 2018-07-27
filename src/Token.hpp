@@ -3,9 +3,9 @@
 #include <map>
 
 typedef enum {
-	Type,
 	Instruction,
 	Symbol,
+	Type,
 	Separator,
 	OpeningBracket,
 	ClosingBracket,

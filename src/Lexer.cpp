@@ -32,6 +32,6 @@ namespace Lexer {
 			}
 			Tokens.push_back("\n");
 		}
-		return std::move(Tokens);
+		return Tokens;
 	}
 }
