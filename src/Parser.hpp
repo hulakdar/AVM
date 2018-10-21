@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "IInstruction.hpp"
+#include "Instruction.hpp"
 
 namespace Parser
 {
-	std::vector<std::unique_ptr<IInstruction>> Parse(const std::vector<std::string>& Tokens);
+	std::vector<std::unique_ptr<Instruction>> Parse(const std::vector<std::string>& Tokens);
 }

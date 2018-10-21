@@ -1,13 +1,14 @@
 #include "OperandFactory.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
-#include "IInstruction.hpp"
+#include "Instruction.hpp"
 #include <fstream>
 #include <vector>
 
-void Execute(const std::vector<std::unique_ptr<IInstruction>>& Instructions)
+void Execute(const std::vector<std::unique_ptr<Instruction>>& Instructions)
 {
-
+	for (auto& Instruction : Instructions)
+		Instruction->Execute();
 }
 
 int main(int argc, char *argv[])
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
 	if (argc > 2)
 	{
 		std::cerr << "Usage:\n";
-		std::cerr << "./avm [filepath]";
+		std::cerr << "./avm [filepath]\n";
 		return 1;
 	}
 
@@ -38,8 +39,8 @@ int main(int argc, char *argv[])
 		for (std::string Line; std::getline(std::cin, Line);)
 			Buffer.push_back(Line);
 
-	std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
-	std::vector<std::unique_ptr<IInstruction>> Instructions = Parser::Parse(Tokens);
+	const std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
+	std::vector<std::unique_ptr<Instruction>> Instructions = Parser::Parse(Tokens);
 
 	Execute(Instructions);
 }

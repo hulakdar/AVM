@@ -119,20 +119,21 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Instruction.cpp" />
     <ClCompile Include="src\Lexer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OperandFactory.cpp" />
     <ClCompile Include="src\Parser.cpp" />
-    <ClCompile Include="src\Token.cpp" />
+    <ClCompile Include="src\VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\IInstruction.hpp" />
+    <ClInclude Include="src\Instruction.hpp" />
     <ClInclude Include="src\Lexer.hpp" />
     <ClInclude Include="src\IOperand.hpp" />
     <ClInclude Include="src\Parser.hpp" />
-    <ClInclude Include="src\Token.hpp" />
     <ClInclude Include="src\OperandFactory.hpp" />
     <ClInclude Include="src\TOperand.hpp" />
+    <ClInclude Include="src\VirtualMachine.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

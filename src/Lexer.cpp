@@ -17,12 +17,12 @@ namespace Lexer {
 				if (OpeningBracket != SingleToken.npos)
 				{
 					Tokens.push_back(SingleToken.substr(0, OpeningBracket));
-					Tokens.push_back("(");
+					//Tokens.push_back("(");
 					auto ClosingBracket = SingleToken.find(")", OpeningBracket);
 					if (ClosingBracket != SingleToken.npos)
 					{
 						Tokens.push_back(SingleToken.substr(OpeningBracket + 1, ClosingBracket - OpeningBracket - 1));
-						Tokens.push_back(")");
+						//Tokens.push_back(")");
 					}
 					else
 						Tokens.push_back(SingleToken.substr(OpeningBracket + 1));
@@ -30,7 +30,7 @@ namespace Lexer {
 				else
 					Tokens.push_back(SingleToken);
 			}
-			Tokens.push_back("\n");
+			//Tokens.push_back("\n");
 		}
 		return Tokens;
 	}
