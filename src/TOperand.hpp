@@ -41,6 +41,11 @@ public:
     {
         return GetType();
     }
+	
+	char GetChar() const
+	{
+		return static_cast<char>(m_Value);
+	}
 
     IOperand const* operator+(IOperand const& rhs) const final
     {
@@ -265,7 +270,7 @@ TOperand<double>::TOperand(const std::string& Value) :
 template <typename L, typename R>
 inline IOperand const *Add(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value + Rhs.m_Value));
 }
@@ -273,7 +278,7 @@ inline IOperand const *Add(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOper
 template<typename L, typename R>
 inline IOperand const * Substract(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value - Rhs.m_Value));
 }
@@ -281,7 +286,7 @@ inline IOperand const * Substract(const TOperand<L>& Lhs, const TOperand<R>& Rhs
 template<typename L, typename R>
 inline IOperand const * Multiply(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value * Rhs.m_Value));
 }
@@ -289,7 +294,7 @@ inline IOperand const * Multiply(const TOperand<L>& Lhs, const TOperand<R>& Rhs,
 template<typename L, typename R>
 inline IOperand const * Divide(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value / Rhs.m_Value));
 }
@@ -297,7 +302,7 @@ inline IOperand const * Divide(const TOperand<L>& Lhs, const TOperand<R>& Rhs, E
 template<typename L, typename R>
 inline IOperand const *Modulo(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(std::remainder(Lhs.m_Value, Rhs.m_Value)));
 }
@@ -305,7 +310,7 @@ inline IOperand const *Modulo(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EO
 template<typename L, typename R>
 inline IOperand const * Power(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
 {
-	std::shared_ptr<OperandFactory> Factory = OperandFactory::Get();
+	OperandFactory *Factory = OperandFactory::Get();
 
 	return Factory->createOperand(ResultingType, std::to_string(std::pow(Lhs.m_Value, Rhs.m_Value)));
 }

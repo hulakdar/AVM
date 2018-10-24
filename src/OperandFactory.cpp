@@ -32,8 +32,8 @@ IOperand const* OperandFactory::createOperand(EOperandType type,
     return (this->*(funcs[type]))(Value);
 }
 
-std::shared_ptr<OperandFactory> OperandFactory::Get()
+OperandFactory *OperandFactory::Get()
 {
-	static std::shared_ptr<OperandFactory> s_OperandFactory(new OperandFactory());
-    return s_OperandFactory;
+	static std::unique_ptr<OperandFactory> s_OperandFactory(new OperandFactory());
+    return s_OperandFactory.get();
 }

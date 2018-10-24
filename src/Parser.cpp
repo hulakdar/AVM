@@ -1,6 +1,12 @@
 #include "Parser.hpp"
 #include <map>
 #include <functional>
+#include "VirtualMachine.hpp"
+#include <iostream>
+#include "OperandFactory.hpp"
+#include <memory>
+#include "TOperand.hpp"
+#include "IOperand.hpp"
 
 enum class ETokenType : unsigned char{
 	Instruction,
@@ -12,101 +18,125 @@ enum class ETokenType : unsigned char{
 	None
 };
 
-const std::map<std::string, ETokenType> s_Tokens = {
-	{"int16", ETokenType::Type},
-	{"int8", ETokenType::Type},
-	{"int32", ETokenType::Type},
-	{"float", ETokenType::Type},
-	{"double", ETokenType::Type},
-	{"\n", ETokenType::Separator},
-	{"(", ETokenType::OpeningBracket},
-	{")", ETokenType::ClosingBracket},
-	{";;", ETokenType::Instruction},
-	{";", ETokenType::Instruction},
-	{"exit", ETokenType::Instruction},
-	{"dump", ETokenType::Instruction},
-	{"add", ETokenType::Instruction},
-	{"sub", ETokenType::Instruction},
-	{"mul", ETokenType::Instruction},
-	{"div", ETokenType::Instruction},
-	{"mod", ETokenType::Instruction},
-	{"print", ETokenType::Instruction},
-	{"push", ETokenType::Instruction},
-	{"pop", ETokenType::Instruction}
+const std::map<std::string, EOperandType> s_Types = {
+	{"int16", EOperandType::Int16},
+	{"int8", EOperandType::Int8},
+	{"int32", EOperandType::Int32},
+	{"float", EOperandType::Float},
+	{"double", EOperandType::Double}
 };
 
-const std::map<std::string, std::function<bool (const std::string&)>> s_Instructions = {
-	{";;",
-	[](const std::string& Instr) -> bool {
+static char GetCharFromOperand(const IOperand*Operand)
+{
+	EOperandType Type = Operand->GetType();
 
+	switch (Type)
+	{
+	case Int8: return ((const TOperand<char>*)Operand)->GetChar();
+	case Int16: return ((const TOperand<short>*)Operand)->GetChar();
+	case Int32: return ((const TOperand<int>*)Operand)->GetChar();
+	case Float: return ((const TOperand<float>*)Operand)->GetChar();
+	case Double: return ((const TOperand<double>*)Operand)->GetChar();
+	default: throw std::exception();
+	}
+	return 0;
+}
+
+const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions = {
+	{";;",
+	[](const IOperand *Value) -> bool {
+		
 		return true;
 	}
 },
 	{";",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"exit",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"dump",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
+		for (auto &Element : VirtualMachine::s_Stack)
+			std::cout << Element->ToString() << "\n";
 		
 		return true;
 	}
 },
 	{"add",
-	[](const std::string& Instr) -> bool {
-		
+	[](const IOperand *Value) -> bool {
+		if (VirtualMachine::s_Stack.size() < 2)
+			throw std::exception();
+
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs + *rhs;
+
+		VirtualMachine::s_Stack.emplace_back(NewTop);
+
 		return true;
 	}
 },
 	{"sub",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"mul",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"div",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"mod",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
 		
 		return true;
 	}
 },
 	{"print",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
+		
+		std::cout << GetCharFromOperand(Value) << "\n";
 		
 		return true;
 	}
 },
 	{"push",
-	[](const std::string& Instr) -> bool {
-		
+	[](const IOperand *Value) -> bool {
+		if (!Value)
+			throw std::exception();
+
+		VirtualMachine::s_Stack.emplace_back(Value);
 		return true;
 	}
 },
 	{"pop",
-	[](const std::string& Instr) -> bool {
+	[](const IOperand *Value) -> bool {
+		if (VirtualMachine::s_Stack.size())
+		{
+			VirtualMachine::s_Stack.pop_back();
+			return true;
+		}
+		else
+			throw std::exception();
 
-
-		return true;
 	}
 }
 };
@@ -119,21 +149,28 @@ namespace Parser
 		VecOfInst Tmp;
 		for (auto It = Tokens.begin(); It != Tokens.end(); ++It)
 		{
-			auto Pair = s_Tokens.find(*It);
-			if (Pair == s_Tokens.end() || Pair->second != ETokenType::Instruction)
+			auto Pair = s_Instructions.find(*It);
+			if (Pair == s_Instructions.end())
 				throw std::exception();
 			
-			auto& Lambda = s_Instructions.find(*It)->second; //the lambda with code
+			auto& Lambda = Pair->second;
 
-			std::string Arg = "";
+			const IOperand *Arg = nullptr;
 			if (*It == "push" || *It == "assert")
 			{
 				if (++It == Tokens.end())
 					throw std::exception();
 
-				Arg = *It;
+				auto Type = s_Types.find(*It);
+
+				if (++It == Tokens.end())
+					throw std::exception();
+
+				OperandFactory *Factory = OperandFactory::Get();
+
+				Arg = Factory->createOperand(Type->second, *It);
 			}
-			Tmp.push_back(std::make_unique<Instruction>(Lambda, Arg));
+			Tmp.emplace_back(new Instruction(Lambda, Arg));
 		}
 		return Tmp;
 	}

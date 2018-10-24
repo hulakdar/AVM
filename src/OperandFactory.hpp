@@ -17,5 +17,5 @@ private:
 public:
     IOperand const* createOperand(EOperandType type, std::string const& value) const;
 
-    static std::shared_ptr<OperandFactory> Get();
+    static OperandFactory *Get();
 };

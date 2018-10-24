@@ -5,7 +5,7 @@
     <NXTargetSerialNumber>Default</NXTargetSerialNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>1</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>test.avm</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

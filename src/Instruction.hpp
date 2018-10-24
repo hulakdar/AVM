@@ -1,12 +1,13 @@
 #pragma once
 #include <functional>
+#include "IOperand.hpp"
 
 class Instruction
 {
-	std::function<bool(const std::string &)> _Func;
-	std::string _Operand;
+	std::function<bool (const IOperand *)> _Func;
+	const IOperand *_Operand;
 public:
-	Instruction(std::function<bool(const std::string &)> Func, const std::string& Operand);
+	Instruction(std::function<bool(const IOperand *)> Func, const IOperand *Operand);
 
-	bool Execute();
+	bool Execute() const;
 };

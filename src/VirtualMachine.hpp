@@ -4,5 +4,5 @@
 
 namespace VirtualMachine
 {
-	extern std::vector<std::unique_ptr<IOperand>> s_Stack;
+	extern std::vector<std::unique_ptr<const IOperand>> s_Stack;
 };
