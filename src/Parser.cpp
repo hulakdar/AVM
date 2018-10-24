@@ -51,13 +51,11 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 },
 	{";",
 	[](const IOperand *Value) -> bool {
-		
 		return true;
 	}
 },
 	{"exit",
 	[](const IOperand *Value) -> bool {
-		
 		return true;
 	}
 },
@@ -82,39 +80,67 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 		const IOperand* NewTop = *lhs + *rhs;
 
 		VirtualMachine::s_Stack.emplace_back(NewTop);
-
 		return true;
 	}
 },
 	{"sub",
 	[](const IOperand *Value) -> bool {
-		
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs - *rhs;
 		return true;
 	}
 },
 	{"mul",
 	[](const IOperand *Value) -> bool {
-		
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs * *rhs;
 		return true;
 	}
 },
 	{"div",
 	[](const IOperand *Value) -> bool {
-		
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs / *rhs;
+		return true;
+	}
+},
+	{"pow",
+	[](const IOperand *Value) -> bool {
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs ^ *rhs;
 		return true;
 	}
 },
 	{"mod",
 	[](const IOperand *Value) -> bool {
-		
+		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+		VirtualMachine::s_Stack.pop_back();
+
+		const IOperand* NewTop = *lhs % *rhs;
 		return true;
 	}
 },
 	{"print",
 	[](const IOperand *Value) -> bool {
-		
-		std::cout << GetCharFromOperand(Value) << "\n";
-		
+		std::cout << GetCharFromOperand(VirtualMachine::s_Stack.back().get());
 		return true;
 	}
 },
@@ -127,16 +153,24 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 		return true;
 	}
 },
-	{"pop",
+	{"assert",
 	[](const IOperand *Value) -> bool {
-		if (VirtualMachine::s_Stack.size())
-		{
-			VirtualMachine::s_Stack.pop_back();
-			return true;
-		}
-		else
+		if (!Value)
 			throw std::exception();
 
+		if (*VirtualMachine::s_Stack.back() != *Value)
+			throw std::exception();
+
+		return true;
+	}
+},
+	{"pop",
+	[](const IOperand *Value) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw std::exception();
+
+		VirtualMachine::s_Stack.pop_back();
+		return true;
 	}
 }
 };

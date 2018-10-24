@@ -30,6 +30,7 @@ namespace Lexer {
 				else
 					Tokens.push_back(SingleToken);
 			}
+			//nextline:
 			//Tokens.push_back("\n");
 		}
 		return Tokens;

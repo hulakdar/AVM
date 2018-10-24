@@ -43,5 +43,5 @@ int main(int argc, char *argv[])
 	std::vector<std::unique_ptr<Instruction>> Instructions = Parser::Parse(Tokens);
 
 	Execute(Instructions);
-	__debugbreak();
+	getchar();
 }
