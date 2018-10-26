@@ -8,7 +8,8 @@
 void Execute(const std::vector<std::unique_ptr<Instruction>>& Instructions)
 {
 	for (auto& Instruction : Instructions)
-		Instruction->Execute();
+		if (!Instruction->Execute())
+			break;
 }
 
 int main(int argc, char *argv[])
@@ -22,7 +23,6 @@ int main(int argc, char *argv[])
 		std::cerr << "./avm [filepath]\n";
 		return 1;
 	}
-
 	if (argc == 2)
 	{
 		const std::string FilePath(argv[1]);
@@ -37,7 +37,10 @@ int main(int argc, char *argv[])
 	}
 	else
 		for (std::string Line; std::getline(std::cin, Line);)
-			Buffer.push_back(Line);
+			if (Line == ";;")
+				break;
+			else
+				Buffer.push_back(Line);
 
 	const std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
 	std::vector<std::unique_ptr<Instruction>> Instructions = Parser::Parse(Tokens);

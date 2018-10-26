@@ -144,6 +144,7 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 namespace Parser
 {
 	using VecOfInst = std::vector<std::unique_ptr<Instruction>>;
+
 	VecOfInst Parse(const std::vector<std::string>& Tokens)
 	{
 		VecOfInst Tmp;
