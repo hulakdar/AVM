@@ -143,6 +143,17 @@ public:
 		return nullptr;
     }
 
+    bool const* operator==(IOperand const& rhs) const final
+    {
+		EOperandType RhsType = rhs.GetType();
+
+		if (RhsType != GetType())
+			return false;
+
+		T& Other = reinterpret_cast<T&>(rhs);
+		return m_Value == Other.m_Value;
+    }
+
     std::string const& ToString(void) const final
     {
 		return m_String;

@@ -19,6 +19,8 @@ class IOperand {
     virtual IOperand const* operator/(IOperand const& rhs) const = 0;
     virtual IOperand const* operator%(IOperand const& rhs) const = 0;
     virtual IOperand const* operator^(IOperand const& rhs) const = 0;
+    virtual bool const* operator==(IOperand const& rhs) const = 0;
+    virtual bool const* operator!=(IOperand const& rhs) const = 0;
     virtual std::string const& ToString(void) const = 0;
     virtual ~IOperand(void) {}
 };
