@@ -12,7 +12,7 @@ namespace Parser
 	{
 		public:
 		virtual const char *what() const _NOEXCEPT override {
-			return "ParseError";
+			return "Parse Error";
 		}
 	};
 

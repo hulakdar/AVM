@@ -36,151 +36,163 @@ static char GetCharFromOperand(const IOperand*Operand)
 	case Int32: return ((const TOperand<int>*)Operand)->GetChar();
 	case Float: return ((const TOperand<float>*)Operand)->GetChar();
 	case Double: return ((const TOperand<double>*)Operand)->GetChar();
-	default: throw Runtime::RuntimeException();
 	}
 	return -1;
 }
 
-const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions = {
-	{"exit",
-	[](const IOperand *) -> bool {
-		return false;
-	}
-},
-	{"dump",
-	[](const IOperand *) -> bool {
-		for (auto &Element : VirtualMachine::s_Stack)
-			std::cout << Element->ToString() << "\n";
+std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
+{
+	{
+		"exit",
+		[](const IOperand *) -> bool {
+			return false;
+		}
+	},
+	{
+		"dump",
+		[](const IOperand *) -> bool {
+			for (auto &Element : VirtualMachine::s_Stack)
+				std::cout << Element->ToString() << "\n";
 
-		return true;
-	}
-},
-	{"add",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		if (VirtualMachine::s_Stack.size() < 2)
-			throw Runtime::StackSizeException();
+			return true;
+		}
+	},
+	{
+		"add",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			if (VirtualMachine::s_Stack.size() < 2)
+				throw Runtime::StackSizeException();
 
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs + *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"sub",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			const IOperand* NewTop = *lhs + *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"sub",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs - *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"mul",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			const IOperand* NewTop = *lhs - *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"mul",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs * *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"div",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			const IOperand* NewTop = *lhs * *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"div",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs / *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"pow",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			const IOperand* NewTop = *lhs / *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"pow",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs ^ *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"mod",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
-		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
-		VirtualMachine::s_Stack.pop_back();
+			const IOperand* NewTop = *lhs ^ *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"mod",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
+			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
+			VirtualMachine::s_Stack.pop_back();
 
-		const IOperand* NewTop = *lhs % *rhs;
-		VirtualMachine::s_Stack.emplace_back(NewTop);
-		return true;
-	}
-},
-	{"print",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		std::cout << GetCharFromOperand(VirtualMachine::s_Stack.back().get());
-		return true;
-	}
-},
-	{"push",
-	[](const IOperand *Value) -> bool {
-		if (!Value)
-			throw Runtime::RuntimeException();
+			const IOperand* NewTop = *lhs % *rhs;
+			VirtualMachine::s_Stack.emplace_back(NewTop);
+			return true;
+		}
+	},
+	{
+		"print",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			std::cout << GetCharFromOperand(VirtualMachine::s_Stack.back().get());
+			return true;
+		}
+	},
+	{
+		"push",
+		[](const IOperand *Value) -> bool {
+			if (!Value)
+				throw Runtime::RuntimeException();
 
-		VirtualMachine::s_Stack.emplace_back(Value);
-		return true;
-	}
-},
-	{"assert",
-	[](const IOperand *Value) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
-		if (!Value)
-			throw Runtime::RuntimeException();
+			VirtualMachine::s_Stack.emplace_back(Value);
+			return true;
+		}
+	},
+	{
+		"assert",
+		[](const IOperand *Value) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
+			if (!Value)
+				throw Runtime::RuntimeException();
 
-		if (*VirtualMachine::s_Stack.back() != *Value)
-			throw Runtime::AssertException();
+			if (*VirtualMachine::s_Stack.back() != *Value)
+				throw Runtime::AssertException();
 
-		return true;
-	}
-},
-	{"pop",
-	[](const IOperand *) -> bool {
-		if (!VirtualMachine::s_Stack.size())
-			throw Runtime::StackSizeException();
+			return true;
+		}
+	},
+	{
+		"pop",
+		[](const IOperand *) -> bool {
+			if (!VirtualMachine::s_Stack.size())
+				throw Runtime::StackSizeException();
 
-		VirtualMachine::s_Stack.pop_back();
-		return true;
+			VirtualMachine::s_Stack.pop_back();
+			return true;
+		}
 	}
-}
 };
 
 namespace Parser
@@ -205,6 +217,9 @@ namespace Parser
 					throw UnknownTypeException();
 
 				auto Type = s_Types.find(*It);
+
+				if (Type == s_Types.end())
+					throw UnknownTypeException();
 
 				if (++It == Tokens.end())
 					throw ParseErrorException();

@@ -41,10 +41,11 @@ int main(int argc, char *argv[])
 			else
 				Buffer.push_back(Line);
 
-	std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
+	std::vector<std::string> Tokens;
 	std::vector<std::unique_ptr<Instruction>> Instructions;
 
 try {
+	Tokens = Lexer::Tokenize(Buffer);
 	Instructions = Parser::Parse(Tokens);
 }
 catch (std::exception& e)

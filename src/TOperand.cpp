@@ -35,7 +35,7 @@ TOperand<char>::TOperand(const std::string& Value) :
 	m_String(Value)
 {
 	int Tmp;
-	Tmp = std::stoi(Value, 0, 0);
+	Tmp = std::stoi(Value, 0);
 	if (Tmp > CHAR_MAX || Tmp < CHAR_MIN)
 		throw std::out_of_range("Out of Int8 range");
 	m_Value = Tmp;
@@ -46,7 +46,7 @@ TOperand<short>::TOperand(const std::string& Value) :
 	m_String(Value)
 {
 	int Tmp;
-	Tmp = std::stoi(Value, 0, 0);
+	Tmp = std::stoi(Value, 0);
 	if (Tmp > SHRT_MAX || Tmp < SHRT_MIN)
 		throw std::out_of_range("Out of Int16 range");
 	m_Value = Tmp;

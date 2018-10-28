@@ -1,5 +1,4 @@
-#ifndef TOPERAND_HPP
-# define TOPERAND_HPP
+#pragma once
 
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
@@ -182,5 +181,3 @@ public:
 	template<typename L, typename R>
 	friend IOperand const *Power(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType);
 };
-
-#endif
