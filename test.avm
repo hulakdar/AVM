@@ -1,6 +1,0 @@
-push int32(2)
-push int8(2)
-dump
-add
-dump
-exit
