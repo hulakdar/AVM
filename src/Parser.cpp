@@ -6,7 +6,6 @@
 #include "OperandFactory.hpp"
 #include <memory>
 #include "TOperand.hpp"
-#include "IOperand.hpp"
 
 enum class ETokenType : unsigned char{
 	Instruction,
@@ -37,40 +36,31 @@ static char GetCharFromOperand(const IOperand*Operand)
 	case Int32: return ((const TOperand<int>*)Operand)->GetChar();
 	case Float: return ((const TOperand<float>*)Operand)->GetChar();
 	case Double: return ((const TOperand<double>*)Operand)->GetChar();
-	default: throw std::exception();
+	default: throw Runtime::RuntimeException();
 	}
-	return 0;
+	return -1;
 }
 
 const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions = {
-	{";;",
-	[](const IOperand *Value) -> bool {
-		
-		return true;
-	}
-},
-	{";",
-	[](const IOperand *Value) -> bool {
-		return true;
-	}
-},
 	{"exit",
-	[](const IOperand *Value) -> bool {
-		return true;
+	[](const IOperand *) -> bool {
+		return false;
 	}
 },
 	{"dump",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
 		for (auto &Element : VirtualMachine::s_Stack)
 			std::cout << Element->ToString() << "\n";
-		
+
 		return true;
 	}
 },
 	{"add",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		if (VirtualMachine::s_Stack.size() < 2)
-			throw std::exception();
+			throw Runtime::StackSizeException();
 
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
@@ -78,68 +68,84 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs + *rhs;
-
 		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"sub",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs - *rhs;
+		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"mul",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs * *rhs;
+		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"div",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs / *rhs;
+		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"pow",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs ^ *rhs;
+		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"mod",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 		std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 		VirtualMachine::s_Stack.pop_back();
 
 		const IOperand* NewTop = *lhs % *rhs;
+		VirtualMachine::s_Stack.emplace_back(NewTop);
 		return true;
 	}
 },
 	{"print",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		std::cout << GetCharFromOperand(VirtualMachine::s_Stack.back().get());
 		return true;
 	}
@@ -147,7 +153,7 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 	{"push",
 	[](const IOperand *Value) -> bool {
 		if (!Value)
-			throw std::exception();
+			throw Runtime::RuntimeException();
 
 		VirtualMachine::s_Stack.emplace_back(Value);
 		return true;
@@ -155,19 +161,21 @@ const std::map<std::string, std::function<bool (const IOperand *)>> s_Instructio
 },
 	{"assert",
 	[](const IOperand *Value) -> bool {
+		if (!VirtualMachine::s_Stack.size())
+			throw Runtime::StackSizeException();
 		if (!Value)
-			throw std::exception();
+			throw Runtime::RuntimeException();
 
 		if (*VirtualMachine::s_Stack.back() != *Value)
-			throw std::exception();
+			throw Runtime::AssertException();
 
 		return true;
 	}
 },
 	{"pop",
-	[](const IOperand *Value) -> bool {
+	[](const IOperand *) -> bool {
 		if (!VirtualMachine::s_Stack.size())
-			throw std::exception();
+			throw Runtime::StackSizeException();
 
 		VirtualMachine::s_Stack.pop_back();
 		return true;
@@ -186,7 +194,7 @@ namespace Parser
 		{
 			auto Pair = s_Instructions.find(*It);
 			if (Pair == s_Instructions.end())
-				throw std::exception();
+				throw UnknownInstructionException();
 			
 			auto& Lambda = Pair->second;
 
@@ -194,12 +202,12 @@ namespace Parser
 			if (*It == "push" || *It == "assert")
 			{
 				if (++It == Tokens.end())
-					throw std::exception();
+					throw UnknownTypeException();
 
 				auto Type = s_Types.find(*It);
 
 				if (++It == Tokens.end())
-					throw std::exception();
+					throw ParseErrorException();
 
 				OperandFactory *Factory = OperandFactory::Get();
 

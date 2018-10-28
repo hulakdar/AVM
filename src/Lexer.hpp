@@ -3,5 +3,5 @@
 
 namespace Lexer
 {
-	std::vector<std::string> Tokenize(const std::vector<std::string>& Stream);
+	std::vector<std::string> Tokenize(std::vector<std::string>& Stream);
 }

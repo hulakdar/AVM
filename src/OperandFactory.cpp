@@ -23,8 +23,7 @@ IOperand const* OperandFactory::createDouble(std::string const& Value) const {
     return (new TOperand<double>(Value));
 }
 
-IOperand const* OperandFactory::createOperand(EOperandType type,
-					      std::string const& Value) const {
+IOperand const* OperandFactory::createOperand(EOperandType type, std::string const& Value) const {
     const static IOperand * (OperandFactory::*funcs[])(std::string const&)const = {
 	&OperandFactory::createInt8, &OperandFactory::createInt16, &OperandFactory::createInt32,
 	&OperandFactory::createFloat, &OperandFactory::createDouble};

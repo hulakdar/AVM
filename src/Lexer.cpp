@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include <string>
 #include <fstream>
 #include <sstream>
 
@@ -9,13 +10,17 @@ namespace Lexer {
 		
 		for (auto& Line : Lines)
 		{
-			std::stringstream Tokenizer(Line);
 			std::string SingleToken;
 			auto Comment = Line.find(';');
 			if (Comment != Line.npos)
 				Line = Line.substr(0, Comment);
+			if (Line == "")
+				continue;
+			std::stringstream Tokenizer(Line);
 			while (std::getline(Tokenizer, SingleToken, ' '))
 			{
+				if (Line == "")
+					continue;
 				auto OpeningBracket = SingleToken.find("(", 0);
 				if (OpeningBracket != SingleToken.npos)
 				{

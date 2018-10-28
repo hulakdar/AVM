@@ -1,6 +1,9 @@
-#pragma once
+#ifndef TOPERAND_HPP
+# define TOPERAND_HPP
 
 #include "IOperand.hpp"
+#include "OperandFactory.hpp"
+#include <cmath>
 #include <climits>
 #include <vector>
 
@@ -19,23 +22,20 @@ class TOperand : public IOperand
 	std::string m_String;
 public:
     TOperand() {}
-    TOperand(const TOperand& Other) {}
+    TOperand(const TOperand& Other) {
+		*this = Other;
+	}
     virtual ~TOperand() {}
 
-    TOperand(const std::string& Value) {
-		exit(200);
-	}
+	TOperand(const std::string &Value);
 
-    TOperand& operator=(const TOperand& Other) {
+	TOperand& operator=(const TOperand& Other) {
 		m_Value = Other.m_Value;
 		m_String = Other.m_String;
         return *this;
     }
 
-	EOperandType GetType(void) const final
-	{
-		exit(200);
-	}
+	virtual EOperandType GetType(void) const final;
 
     int GetPrecision(void) const final
     {
@@ -143,16 +143,21 @@ public:
 		return nullptr;
     }
 
-    bool const* operator==(IOperand const& rhs) const final
+    bool operator==(IOperand const& rhs) const final
     {
 		EOperandType RhsType = rhs.GetType();
 
 		if (RhsType != GetType())
 			return false;
 
-		T& Other = reinterpret_cast<T&>(rhs);
+		const TOperand<T>& Other = reinterpret_cast<const TOperand<T>&>(rhs);
 		return m_Value == Other.m_Value;
     }
+
+    bool operator!=(IOperand const& rhs) const final
+	{
+		return !(*this == rhs);
+	}
 
     std::string const& ToString(void) const final
     {
@@ -178,150 +183,4 @@ public:
 	friend IOperand const *Power(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType);
 };
 
-template<typename T>
-TOperand<T>::TOperand(const std::string& Value);
-
-template<typename T>
-EOperandType TOperand<T>::GetType() const ;
-
-template<>
-EOperandType TOperand<char>::GetType() const
-{
-	return Int8;
-}
-
-template<>
-EOperandType TOperand<short>::GetType() const
-{
-	return Int16;
-}
-
-template<>
-EOperandType TOperand<int>::GetType() const
-{
-	return Int32;
-}
-
-template<>
-EOperandType TOperand<float>::GetType() const
-{
-	return Float;
-}
-
-template<>
-EOperandType TOperand<double>::GetType() const
-{
-	return Double;
-}
-
-template<>
-TOperand<char>::TOperand(const std::string& Value) :
-	m_String(Value)
-{
-	int Tmp;
-	Tmp = std::stoi(Value, 0, 0);
-	if (Tmp > CHAR_MAX || Tmp < CHAR_MIN)
-		throw std::out_of_range("Out of Int8 range");
-	m_Value = Tmp;
-}
-
-template<>
-TOperand<short>::TOperand(const std::string& Value) :
-	m_String(Value)
-{
-	int Tmp;
-	Tmp = std::stoi(Value, 0, 0);
-	if (Tmp > SHRT_MAX || Tmp < SHRT_MIN)
-		throw std::out_of_range("Out of Int16 range");
-	m_Value = Tmp;
-}
-
-template<>
-TOperand<int>::TOperand(const std::string& Value) :
-	m_String(Value)
-{
-	int Tmp;
-	try {
-		Tmp = std::stoi(Value);
-	}
-	catch (std::out_of_range) {
-		throw std::out_of_range("Out of Int32 range");
-	}
-	m_Value = Tmp;
-}
-
-template<>
-TOperand<float>::TOperand(const std::string& Value) :
-	m_String(Value)
-{
-	float Tmp;
-	try {
-		Tmp = std::stof(Value);
-	}
-	catch (std::out_of_range) {
-		throw std::out_of_range("Out of Float range");
-	}
-	m_Value = Tmp;
-}
-
-template<>
-TOperand<double>::TOperand(const std::string& Value) :
-	m_String(Value)
-{
-	double Tmp;
-	try {
-		Tmp = std::stod(Value);
-	}
-	catch (std::out_of_range) {
-		throw std::out_of_range("Out of Double range");
-	}
-	m_Value = Tmp;
-}
-
-template <typename L, typename R>
-inline IOperand const *Add(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value + Rhs.m_Value));
-}
-
-template<typename L, typename R>
-inline IOperand const * Substract(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value - Rhs.m_Value));
-}
-
-template<typename L, typename R>
-inline IOperand const * Multiply(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value * Rhs.m_Value));
-}
-
-template<typename L, typename R>
-inline IOperand const * Divide(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value / Rhs.m_Value));
-}
-
-template<typename L, typename R>
-inline IOperand const *Modulo(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(std::remainder(Lhs.m_Value, Rhs.m_Value)));
-}
-
-template<typename L, typename R>
-inline IOperand const * Power(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandType ResultingType)
-{
-	OperandFactory *Factory = OperandFactory::Get();
-
-	return Factory->createOperand(ResultingType, std::to_string(std::pow(Lhs.m_Value, Rhs.m_Value)));
-}
+#endif

@@ -4,10 +4,10 @@
 
 class Instruction
 {
-	std::function<bool (const IOperand *)> _Func;
-	const IOperand *_Operand;
+	const std::function<bool (const IOperand *)>&	_Func;
+	const IOperand									*_Operand;
 public:
-	Instruction(std::function<bool(const IOperand *)> Func, const IOperand *Operand);
+	Instruction(const std::function<bool(const IOperand *)>& Func, const IOperand *Operand);
 
 	bool Execute() const;
 };

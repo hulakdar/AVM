@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 {
 	std::vector<std::string> Buffer;
 
-	// if filepath provided
 	if (argc > 2)
 	{
 		std::cerr << "Usage:\n";
@@ -42,9 +41,25 @@ int main(int argc, char *argv[])
 			else
 				Buffer.push_back(Line);
 
-	const std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
-	std::vector<std::unique_ptr<Instruction>> Instructions = Parser::Parse(Tokens);
+	std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
+	std::vector<std::unique_ptr<Instruction>> Instructions;
 
+try {
+	Instructions = Parser::Parse(Tokens);
+}
+catch (std::exception& e)
+{
+	std::cerr << e.what() << "\n";
+	return 1;
+}
+
+
+try {
 	Execute(Instructions);
-	getchar();
+}
+catch (Runtime::RuntimeException& e)
+{
+	std::cerr << "\n" << e.what() << "\n";
+	return 2;
+}
 }

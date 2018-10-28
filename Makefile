@@ -1,12 +1,12 @@
 NAME        = avm
 CXX         = g++
-CXXFLAGS    = -Wall -Wextra -pedantic -std=c++11 -g
+CXXFLAGS    = -Wall -Wextra -pedantic -std=c++11 -g -O0
 
 OBJ_DIR    = obj/
 INC_DIR    = inc/
 SRC_DIR    = src/
 
-FILES  = OperandFactory main
+FILES  = OperandFactory Instruction Lexer VirtualMachine TOperand Parser main
 
 OBJ        = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(FILES) ) )
 HEADERS    = $(addsuffix .hpp, $(FILES))
