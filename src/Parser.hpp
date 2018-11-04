@@ -32,30 +32,3 @@ namespace Parser
 		}
 	};
 }
-
-namespace Runtime
-{
-	class RuntimeException : public std::exception
-	{
-		public:
-		virtual const char *what() const _NOEXCEPT override {
-			return "Runtime Error";
-		}
-	};
-
-	class AssertException : public RuntimeException
-	{
-		public:
-		virtual const char *what() const _NOEXCEPT final {
-			return "Assert Failed";
-		}
-	};
-
-	class StackSizeException : public RuntimeException
-	{
-		public:
-		virtual const char *what() const _NOEXCEPT final {
-			return "Assert Failed";
-		}
-	};
-}

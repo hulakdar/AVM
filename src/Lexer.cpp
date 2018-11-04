@@ -33,12 +33,11 @@ namespace Lexer {
 				{
 					Tokens.push_back(SingleToken.substr(0, OpeningBracket));
 					auto ClosingBracket = SingleToken.find(")", OpeningBracket);
+					if (ClosingBracket == SingleToken.npos)
+						throw Parser::ParseErrorException();
 					if (OpeningBracket - 1 == ClosingBracket)
 						throw Parser::ParseErrorException();
-					if (ClosingBracket != SingleToken.npos)
-						Tokens.push_back(SingleToken.substr(OpeningBracket + 1, ClosingBracket - OpeningBracket - 1));
-					else
-						Tokens.push_back(SingleToken.substr(OpeningBracket + 1));
+					Tokens.push_back(SingleToken.substr(OpeningBracket + 1, ClosingBracket - OpeningBracket - 1));
 				}
 				else
 					Tokens.push_back(SingleToken);

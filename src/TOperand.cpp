@@ -1,4 +1,5 @@
 #include "TOperand.hpp"
+#include "VirtualMachine.hpp"
 
 template<>
 EOperandType TOperand<char>::GetType() const
@@ -35,7 +36,12 @@ TOperand<char>::TOperand(const std::string& Value) :
 	m_String(Value)
 {
 	int Tmp;
-	Tmp = std::stoi(Value, 0);
+	try {
+		Tmp = std::stoi(Value, 0);
+	}
+	catch (std::out_of_range) {
+		throw std::out_of_range("Out of Int8 range");
+	}
 	if (Tmp > CHAR_MAX || Tmp < CHAR_MIN)
 		throw std::out_of_range("Out of Int8 range");
 	m_Value = Tmp;
@@ -46,7 +52,12 @@ TOperand<short>::TOperand(const std::string& Value) :
 	m_String(Value)
 {
 	int Tmp;
-	Tmp = std::stoi(Value, 0);
+	try {
+		Tmp = std::stoi(Value, 0);
+	}
+	catch (std::out_of_range) {
+		throw std::out_of_range("Out of Int16 range");
+	}
 	if (Tmp > SHRT_MAX || Tmp < SHRT_MIN)
 		throw std::out_of_range("Out of Int16 range");
 	m_Value = Tmp;
@@ -123,6 +134,8 @@ IOperand const * Divide(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperand
 {
 	OperandFactory *Factory = OperandFactory::Get();
 
+	if (Rhs.m_Value == (R)0)
+		throw Runtime::DivisionByZeroException();
 	return Factory->createOperand(ResultingType, std::to_string(Lhs.m_Value / Rhs.m_Value));
 }
 
@@ -131,6 +144,8 @@ IOperand const *Modulo(const TOperand<L>& Lhs, const TOperand<R>& Rhs, EOperandT
 {
 	OperandFactory *Factory = OperandFactory::Get();
 
+	if (Rhs.m_Value == (R)0)
+		throw Runtime::DivisionByZeroException();
 	return Factory->createOperand(ResultingType, std::to_string(std::remainder(Lhs.m_Value, Rhs.m_Value)));
 }
 

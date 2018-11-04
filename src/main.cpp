@@ -1,15 +1,21 @@
 #include "OperandFactory.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "VirtualMachine.hpp"
 #include "Instruction.hpp"
 #include <fstream>
 #include <vector>
 
 void Execute(const std::vector<std::unique_ptr<Instruction>>& Instructions)
 {
+	auto& LastInstruction = Instructions.back();
 	for (auto& Instruction : Instructions)
-		if (!Instruction->Execute())
-			break;
+	{
+		if (&Instruction == &LastInstruction && Instruction->Execute())
+			throw Runtime::ExitException();
+		else
+			Instruction->Execute();
+	}
 }
 
 int main(int argc, char *argv[])
@@ -44,23 +50,25 @@ int main(int argc, char *argv[])
 	std::vector<std::string> Tokens;
 	std::vector<std::unique_ptr<Instruction>> Instructions;
 
-try {
-	Tokens = Lexer::Tokenize(Buffer);
-	Instructions = Parser::Parse(Tokens);
-}
-catch (std::exception& e)
-{
-	std::cerr << e.what() << "\n";
-	return 1;
-}
+	try
+	{
+		Tokens = Lexer::Tokenize(Buffer);
+		Instructions = Parser::Parse(Tokens);
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << "\n";
+		return 1;
+	}
 
-
-try {
-	Execute(Instructions);
-}
-catch (Runtime::RuntimeException& e)
-{
-	std::cerr << "\n" << e.what() << "\n";
-	return 2;
-}
+	try
+	{
+		Execute(Instructions);
+	}
+	catch (Runtime::RuntimeException &e)
+	{
+		std::cerr << "\n"
+				  << e.what() << "\n";
+		return 2;
+	}
 }
