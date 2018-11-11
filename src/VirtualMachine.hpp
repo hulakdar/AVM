@@ -5,6 +5,7 @@
 namespace VirtualMachine
 {
 	extern std::vector<std::unique_ptr<const IOperand>> s_Stack;
+	extern bool s_Exit;
 };
 
 namespace Runtime
@@ -18,6 +19,14 @@ namespace Runtime
 	};
 
 	class AssertException : public RuntimeException
+	{
+		public:
+		virtual const char *what() const _NOEXCEPT final {
+			return "Assert Failed";
+		}
+	};
+
+	class EarlyExitException : public RuntimeException
 	{
 		public:
 		virtual const char *what() const _NOEXCEPT final {

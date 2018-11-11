@@ -40,28 +40,24 @@ static char GetCharFromOperand(const IOperand*Operand)
 	return -1;
 }
 
-std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
+std::map<std::string, std::function<void (void)>> s_Instructions =
 {
 	{
 		"exit",
-		[](const IOperand *) -> bool {
-			return false;
+		[](){
+			VirtualMachine::s_Exit = true;
 		}
 	},
 	{
 		"dump",
-		[](const IOperand *) -> bool {
+		[](){
 			for (auto &Element : VirtualMachine::s_Stack)
 				std::cout << Element->ToString() << "\n";
-
-			return true;
 		}
 	},
 	{
 		"add",
-		[](const IOperand *) -> bool {
-			if (!VirtualMachine::s_Stack.size())
-				throw Runtime::StackSizeException();
+		[](){
 			if (VirtualMachine::s_Stack.size() < 2)
 				throw Runtime::StackSizeException();
 
@@ -70,14 +66,13 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs + *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs + *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"sub",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
@@ -85,14 +80,13 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs - *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs - *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"mul",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
@@ -100,14 +94,13 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs * *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs * *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"div",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
@@ -115,14 +108,13 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs / *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs / *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"pow",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
@@ -130,14 +122,13 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs ^ *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs ^ *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"mod",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::unique_ptr<const IOperand> rhs = std::move(VirtualMachine::s_Stack.back());
@@ -145,72 +136,68 @@ std::map<std::string, std::function<bool (const IOperand *)>> s_Instructions =
 			std::unique_ptr<const IOperand> lhs = std::move(VirtualMachine::s_Stack.back());
 			VirtualMachine::s_Stack.pop_back();
 
-			const IOperand* NewTop = *lhs % *rhs;
-			VirtualMachine::s_Stack.emplace_back(NewTop);
-			return true;
+			std::unique_ptr<const IOperand> NewTop(*lhs % *rhs);
+			VirtualMachine::s_Stack.push_back(std::move(NewTop));
 		}
 	},
 	{
 		"print",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 			std::cout << GetCharFromOperand(VirtualMachine::s_Stack.back().get());
-			return true;
 		}
 	},
 	{
 		"push",
-		[](const IOperand *Value) -> bool {
+		[](){
+			std::unique_ptr<const IOperand> Value = std::move(Parser::s_Arguments.back());
+			Parser::s_Arguments.pop_back();
 			if (!Value)
 				throw Runtime::RuntimeException();
 
-			VirtualMachine::s_Stack.emplace_back(Value);
-			return true;
+			VirtualMachine::s_Stack.emplace_back(std::move(Value));
 		}
 	},
 	{
 		"assert",
-		[](const IOperand *Value) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
+
+			std::unique_ptr<const IOperand> Value = std::move(Parser::s_Arguments.back());
+			Parser::s_Arguments.pop_back();
 			if (!Value)
 				throw Runtime::RuntimeException();
 
 			if (*VirtualMachine::s_Stack.back() != *Value)
 				throw Runtime::AssertException();
-
-			return true;
 		}
 	},
 	{
 		"pop",
-		[](const IOperand *) -> bool {
+		[](){
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 
 			VirtualMachine::s_Stack.pop_back();
-			return true;
 		}
 	}
 };
 
 namespace Parser
 {
-	using VecOfInst = std::vector<std::unique_ptr<Instruction>>;
-
-	VecOfInst Parse(const std::vector<std::string>& Tokens)
+	std::vector<Instruction> Parse(const std::vector<std::string>& Tokens)
 	{
-		VecOfInst Tmp;
+		std::vector<Instruction> Tmp;
 		for (auto It = Tokens.begin(); It != Tokens.end(); ++It)
 		{
 			auto Pair = s_Instructions.find(*It);
 			if (Pair == s_Instructions.end())
 				throw UnknownInstructionException();
 			
-			auto& Lambda = Pair->second;
+			Tmp.emplace_back(Pair->second);
 
-			const IOperand *Arg = nullptr;
 			if (*It == "push" || *It == "assert")
 			{
 				if (++It == Tokens.end())
@@ -224,11 +211,8 @@ namespace Parser
 				if (++It == Tokens.end())
 					throw ParseErrorException();
 
-				OperandFactory *Factory = OperandFactory::Get();
-
-				Arg = Factory->createOperand(Type->second, *It);
+				Parser::s_Arguments.emplace_back(OperandFactory::Get()->createOperand(Type->second, *It));
 			}
-			Tmp.emplace_back(new Instruction(Lambda, Arg));
 		}
 		return Tmp;
 	}

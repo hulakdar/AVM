@@ -6,15 +6,15 @@
 #include <fstream>
 #include <vector>
 
-void Execute(const std::vector<std::unique_ptr<Instruction>>& Instructions)
+void Execute(const std::vector<std::function<void (void)>>& Instructions)
 {
 	auto& LastInstruction = Instructions.back();
 	for (auto& Instruction : Instructions)
 	{
-		if (&Instruction == &LastInstruction && Instruction->Execute())
-			throw Runtime::ExitException();
-		else
-			Instruction->Execute();
+		Instruction->Execute();
+		if (VirtualMachine::s_Exit)
+			if (&Instruction != &LastInstruction)
+				throw Runtime::EarlyExitException();
 	}
 }
 
@@ -47,28 +47,15 @@ int main(int argc, char *argv[])
 			else
 				Buffer.push_back(Line);
 
-	std::vector<std::string> Tokens;
-	std::vector<std::unique_ptr<Instruction>> Instructions;
-
 	try
 	{
-		Tokens = Lexer::Tokenize(Buffer);
-		Instructions = Parser::Parse(Tokens);
+		std::vector<std::string> Tokens = Lexer::Tokenize(Buffer);
+		std::vector<std::function<void (void)>> Instructions = Parser::Parse(Tokens);
+		Execute(Instructions);
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << "\n";
 		return 1;
-	}
-
-	try
-	{
-		Execute(Instructions);
-	}
-	catch (Runtime::RuntimeException &e)
-	{
-		std::cerr << "\n"
-				  << e.what() << "\n";
-		return 2;
 	}
 }
