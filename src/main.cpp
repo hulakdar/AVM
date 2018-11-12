@@ -2,7 +2,6 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
 #include "VirtualMachine.hpp"
-#include "Instruction.hpp"
 #include <fstream>
 #include <vector>
 
@@ -11,7 +10,7 @@ void Execute(const std::vector<std::function<void (void)>>& Instructions)
 	auto& LastInstruction = Instructions.back();
 	for (auto& Instruction : Instructions)
 	{
-		Instruction->Execute();
+		Instruction();
 		if (VirtualMachine::s_Exit)
 			if (&Instruction != &LastInstruction)
 				throw Runtime::EarlyExitException();

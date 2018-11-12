@@ -17,6 +17,7 @@ enum class ETokenType : unsigned char{
 	None
 };
 
+
 const std::map<std::string, EOperandType> s_Types = {
 	{"int16", EOperandType::Int16},
 	{"int8", EOperandType::Int8},
@@ -151,8 +152,8 @@ std::map<std::string, std::function<void (void)>> s_Instructions =
 	{
 		"push",
 		[](){
-			std::unique_ptr<const IOperand> Value = std::move(Parser::s_Arguments.back());
-			Parser::s_Arguments.pop_back();
+			std::unique_ptr<const IOperand> Value = std::move(VirtualMachine::s_Arguments.back());
+			VirtualMachine::s_Arguments.pop_back();
 			if (!Value)
 				throw Runtime::RuntimeException();
 
@@ -165,8 +166,8 @@ std::map<std::string, std::function<void (void)>> s_Instructions =
 			if (!VirtualMachine::s_Stack.size())
 				throw Runtime::StackSizeException();
 
-			std::unique_ptr<const IOperand> Value = std::move(Parser::s_Arguments.back());
-			Parser::s_Arguments.pop_back();
+			std::unique_ptr<const IOperand> Value = std::move(VirtualMachine::s_Arguments.back());
+			VirtualMachine::s_Arguments.pop_back();
 			if (!Value)
 				throw Runtime::RuntimeException();
 
@@ -211,7 +212,7 @@ namespace Parser
 				if (++It == Tokens.end())
 					throw ParseErrorException();
 
-				Parser::s_Arguments.emplace_back(OperandFactory::Get()->createOperand(Type->second, *It));
+				VirtualMachine::s_Arguments.emplace_back(OperandFactory::Get()->createOperand(Type->second, *It));
 			}
 		}
 		return Tmp;

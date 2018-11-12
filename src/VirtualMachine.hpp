@@ -2,9 +2,14 @@
 #include <vector>
 #include "IOperand.hpp"
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT
+#endif
+
 namespace VirtualMachine
 {
 	extern std::vector<std::unique_ptr<const IOperand>> s_Stack;
+	extern std::vector<std::unique_ptr<const IOperand>> s_Arguments;
 	extern bool s_Exit;
 };
 
