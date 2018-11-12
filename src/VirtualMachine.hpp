@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <list>
 #include "IOperand.hpp"
 
 #ifndef _NOEXCEPT
@@ -9,7 +10,7 @@
 namespace VirtualMachine
 {
 	extern std::vector<std::unique_ptr<const IOperand>> s_Stack;
-	extern std::vector<std::unique_ptr<const IOperand>> s_Arguments;
+	extern std::list<std::unique_ptr<const IOperand>> s_Arguments;
 	extern bool s_Exit;
 };
 
@@ -35,7 +36,15 @@ namespace Runtime
 	{
 		public:
 		virtual const char *what() const _NOEXCEPT final {
-			return "Assert Failed";
+			return "Early Exit";
+		}
+	};
+
+	class NoExitException : public RuntimeException
+	{
+		public:
+		virtual const char *what() const _NOEXCEPT final {
+			return "No exit instruction";
 		}
 	};
 

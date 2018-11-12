@@ -22,7 +22,7 @@ namespace Lexer {
 			int i = 0;
 			while (std::getline(Tokenizer, SingleToken, ' '))
 			{
-				if (Line == "")
+				if (SingleToken == "")
 					continue;
 
 				if (++i > 2)

@@ -212,7 +212,7 @@ namespace Parser
 				if (++It == Tokens.end())
 					throw ParseErrorException();
 
-				VirtualMachine::s_Arguments.emplace_back(OperandFactory::Get()->createOperand(Type->second, *It));
+				VirtualMachine::s_Arguments.emplace_front(OperandFactory::Get()->createOperand(Type->second, *It));
 			}
 		}
 		return Tmp;

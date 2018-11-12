@@ -15,6 +15,9 @@ void Execute(const std::vector<std::function<void (void)>>& Instructions)
 			if (&Instruction != &LastInstruction)
 				throw Runtime::EarlyExitException();
 	}
+	if (!VirtualMachine::s_Exit)
+		throw Runtime::NoExitException();
+
 }
 
 int main(int argc, char *argv[])
